@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบแจ้งปัญหาและขอปรับปรุงการทำงาน</title>
+  <style>
+    :root {
+      --primary: #1f4fd8;
+      --primary-dark: #173aa0;
+      --soft-blue: #eef4ff;
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #182033;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans Thai", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1f4fd8, #0f766e);
+      color: white;
+      padding: 28px 7vw 72px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 56px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.18);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+    }
+
+    .nav-actions a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+      opacity: .92;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 46px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.12;
+      margin: 0 0 18px;
+      letter-spacing: -.8px;
+    }
+
+    .hero p {
+      font-size: 19px;
+      max-width: 700px;
+      opacity: .93;
+      margin: 0 0 28px;
+    }
+
+    .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-primary { background: white; color: var(--primary-dark); }
+    .btn-secondary { background: rgba(255,255,255,.16); color: white; border: 1px solid rgba(255,255,255,.34); }
+
+    .hero-card {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: var(--radius);
+      padding: 26px;
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      background: rgba(255,255,255,.16);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .metric strong { display: block; font-size: 28px; }
+    .metric span { opacity: .86; font-size: 14px; }
+
+    main { padding: 0 7vw 64px; }
+
+    .section-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 30px;
+      margin-top: -42px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    .section-title h2 { margin: 0; font-size: 28px; }
+    .section-title p { margin: 6px 0 0; color: var(--muted); }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .issue-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      background: white;
+      text-decoration: none;
+      color: var(--text);
+      min-height: 170px;
+      transition: .18s ease;
+      cursor: pointer;
+    }
+    .issue-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(31, 79, 216, .13);
+      border-color: #bfd0ff;
+    }
+    .issue-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 17px;
+      background: var(--soft-blue);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+    .issue-card h3 { margin: 0 0 6px; font-size: 17px; }
+    .issue-card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .form-card, .side-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .form-section {
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+    .form-section:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+    .form-section h3 { margin: 0 0 16px; font-size: 20px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    label { display: block; font-weight: 700; margin-bottom: 7px; font-size: 14px; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      background: #fff;
+      outline: none;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(31, 79, 216, .08); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .chip:hover { border-color: var(--primary); color: var(--primary); background: var(--soft-blue); }
+
+    .submit-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      border-top: 1px solid var(--line);
+      margin-top: 28px;
+      padding-top: 22px;
+    }
+    .submit-bar p { margin: 0; color: var(--muted); font-size: 14px; }
+    .submit-btn {
+      background: var(--primary);
+      color: white;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .side-card { position: sticky; top: 20px; height: fit-content; }
+    .status-list { display: grid; gap: 12px; }
+    .status-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); flex: 0 0 auto; }
+    .dot.warning { background: var(--warning); }
+    .dot.success { background: var(--success); }
+    .dot.danger { background: var(--danger); }
+    .status-item strong { display: block; font-size: 14px; }
+    .status-item span { color: var(--muted); font-size: 13px; }
+
+    .urgency {
+      display: grid;
+      gap: 10px;
+    }
+    .urgency-card {
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .urgency-card strong { display: block; margin-bottom: 2px; }
+    .urgency-card span { font-size: 13px; color: var(--muted); }
+
+    footer {
+      margin-top: 34px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1050px) {
+      .hero, .layout { grid-template-columns: 1fr; }
+      .icon-grid { grid-template-columns: repeat(2, 1fr); }
+      .side-card { position: static; }
+    }
+    @media (max-width: 640px) {
+      header, main { padding-left: 18px; padding-right: 18px; }
+      .nav-actions { display: none; }
+      .icon-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .section-card, .form-card, .side-card { padding: 20px; }
+      .submit-bar { align-items: stretch; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="logo"><div class="logo-mark">⚙️</div> Process Improvement Portal</div>
+      <nav class="nav-actions">
+        <a href="#issue-types">แจ้งปัญหา</a>
+        <a href="#form">กรอกฟอร์ม</a>
+        <a href="#status">ติดตามสถานะ</a>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <div>
+        <h1>แจ้ง Pain Point เพื่อปรับปรุงงานให้เร็วขึ้น ง่ายขึ้น และผิดพลาดน้อยลง</h1>
+        <p>พนักงานสามารถเลือกประเภทปัญหาจากไอคอน กรอกรายละเอียด ผลกระทบ สาเหตุ และข้อเสนอแนะ เพื่อให้ทีม Process Improvement รับเรื่อง วิเคราะห์ และติดตามผลได้เป็นระบบ</p>
+        <div class="hero-buttons">
+          <a class="btn btn-primary" href="#issue-types">🚀 เริ่มแจ้งปัญหา</a>
+          <a class="btn btn-secondary" href="#status">📊 ดูสถานะคำขอ</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2 style="margin-top:0">ภาพรวมคำขอเดือนนี้</h2>
+        <p style="margin:0;opacity:.88">ตัวเลขส่วนนี้เชื่อมกับ Database / Google Sheet / Workflow System ได้ภายหลัง</p>
+        <div class="metric-row">
+          <div class="metric"><strong>24</strong><span>คำขอทั้งหมด</span></div>
+          <div class="metric"><strong>8</strong><span>Quick Win</span></div>
+          <div class="metric"><strong>11</strong><span>อยู่ระหว่างวิเคราะห์</span></div>
+          <div class="metric"><strong>5</strong><span>ปิดงานแล้ว</span></div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section id="issue-types" class="section-card">
+      <div class="section-title">
+        <div>
+          <h2>เลือกประเภทปัญหาที่ต้องการแจ้ง</h2>
+          <p>คลิกไอคอนที่ตรงกับ Pain Point มากที่สุด แล้วระบบจะพาไปกรอกฟอร์ม</p>
+        </div>
+      </div>
+
+      <div class="icon-grid">
+        <a class="issue-card" href="#form"><div class="issue-icon">🔁</div><h3>ขั้นตอนซ้ำซ้อน</h3><p>มีการกรอกข้อมูลซ้ำ ตรวจซ้ำ หรือส่งต่องานหลายรอบ</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">⏱️</div><h3>งานล่าช้า</h3><p>ใช้เวลานาน รออนุมัติ รอข้อมูล หรือคอขวดในกระบวนการ</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">🧾</div><h3>เอกสารผิดพลาด</h3><p>ข้อมูลตกหล่น เอกสารไม่ตรงกัน หรือแก้งานบ่อย</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">💻</div><h3>ระบบใช้งานไม่สะดวก</h3><p>ระบบไม่รองรับงานจริง ใช้งานยาก หรือทำให้ต้องทำมือเพิ่ม</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">🤝</div><h3>ประสานงานติดขัด</h3><p>ส่งต่องานไม่ชัดเจน ตามงานยาก หรือข้อมูลไม่ถึงผู้เกี่ยวข้อง</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">👤</div><h3>ไม่ชัดว่าใครรับผิดชอบ</h3><p>ไม่มี Owner งาน หรือบทบาทการอนุมัติไม่ชัด</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">💸</div><h3>ต้นทุนสูง</h3><p>ใช้คน เวลา งบประมาณ หรือทรัพยากรเกินความจำเป็น</p></a>
+        <a class="issue-card" href="#form"><div class="issue-icon">🙋</div><h3>กระทบลูกค้า / ผู้ใช้งาน</h3><p>บริการช้า คุณภาพลด หรือผู้ใช้งานได้รับผลกระทบโดยตรง</p></a>
+      </div>
+    </section>
+
+    <section class="layout" id="form">
+      <div class="form-card">
+        <div class="form-section">
+          <h3>1. ข้อมูลผู้แจ้ง</h3>
+          <div class="grid-2">
+            <div><label>ชื่อผู้แจ้ง</label><input placeholder="เช่น สมชาย ใจดี" /></div>
+            <div><label>แผนก / หน่วยงาน</label><input placeholder="เช่น Accounting / Sales / PM" /></div>
+            <div><label>ตำแหน่ง</label><input placeholder="เช่น Officer / Manager" /></div>
+            <div><label>ช่องทางติดต่อ</label><input placeholder="Email / เบอร์โทร / Teams" /></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>2. หัวข้อปัญหา</h3>
+          <div class="grid-2">
+            <div><label>ชื่อเรื่อง / หัวข้อปัญหา</label><input placeholder="สรุปปัญหาเป็นประโยคสั้นๆ" /></div>
+            <div><label>ประเภทของเรื่อง</label><select><option>ขั้นตอนการทำงานซ้ำซ้อน</option><option>งานล่าช้า / ใช้เวลานาน</option><option>เอกสารหรือข้อมูลผิดพลาดบ่อย</option><option>ระบบ / โปรแกรมใช้งานไม่สะดวก</option><option>การประสานงานติดขัด</option><option>ขาดผู้รับผิดชอบที่ชัดเจน</option><option>ต้นทุนสูง / ใช้ทรัพยากรเกินจำเป็น</option><option>ลูกค้า / ผู้ใช้งานได้รับผลกระทบ</option></select></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>3. รายละเอียด Pain Point</h3>
+          <label>อธิบายปัญหาที่พบในปัจจุบัน</label>
+          <textarea placeholder="เล่าว่าปัจจุบันเกิดอะไรขึ้น ใครเกี่ยวข้อง เกิดตรงขั้นตอนไหน"></textarea>
+          <div class="grid-2" style="margin-top:16px">
+            <div><label>เกิดในกระบวนการ / ขั้นตอนใด</label><input placeholder="เช่น ขออนุมัติ PO / ปิดงบ / ส่งมอบงาน" /></div>
+            <div><label>เกิดขึ้นบ่อยแค่ไหน</label><select><option>ทุกวัน</option><option>ทุกสัปดาห์</option><option>ทุกเดือน</option><option>เป็นครั้งคราว</option></select></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>4. ผลกระทบที่เกิดขึ้น</h3>
+          <div class="chips">
+            <button class="chip">งานล่าช้า</button><button class="chip">ต้องทำงานซ้ำ</button><button class="chip">เกิดข้อผิดพลาด</button><button class="chip">เสียเวลาติดตามงาน</button><button class="chip">กระทบลูกค้า</button><button class="chip">กระทบต้นทุน</button><button class="chip">กระทบคุณภาพงาน</button>
+          </div>
+          <div class="grid-3" style="margin-top:16px">
+            <div><label>เวลาที่เสียไปโดยประมาณ</label><input placeholder="ชั่วโมง / วัน / เดือน" /></div>
+            <div><label>จำนวนคนที่ได้รับผลกระทบ</label><input placeholder="คน" /></div>
+            <div><label>มูลค่าความเสียหาย ถ้ามี</label><input placeholder="บาท" /></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>5. สาเหตุที่คาดว่าเป็นต้นตอ</h3>
+          <div class="chips">
+            <button class="chip">ขั้นตอนไม่ชัดเจน</button><button class="chip">ไม่มี SOP</button><button class="chip">ระบบไม่รองรับ</button><button class="chip">ข้อมูลไม่ครบ</button><button class="chip">อนุมัติหลายชั้น</button><button class="chip">สื่อสารข้ามทีมไม่ดี</button><button class="chip">คนไม่พอ</button><button class="chip">ขาดทักษะ</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>6. ข้อเสนอแนะในการปรับปรุง</h3>
+          <label>แนวทางที่เสนอให้ปรับปรุง</label>
+          <textarea placeholder="เช่น ตัดขั้นตอนที่ซ้ำ ทำฟอร์มกลาง ทำ dashboard ติดตามงาน หรือทำ automation"></textarea>
+          <label style="margin-top:16px">ผลลัพธ์ที่คาดหวัง</label>
+          <div class="chips">
+            <button class="chip">ลดเวลาทำงาน</button><button class="chip">ลดงานซ้ำ</button><button class="chip">ลดข้อผิดพลาด</button><button class="chip">ลดต้นทุน</button><button class="chip">เพิ่มความเร็ว</button><button class="chip">เพิ่มความชัดเจนของ Owner</button><button class="chip">เพิ่มคุณภาพงาน</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>7. เอกสารประกอบและความเร่งด่วน</h3>
+          <div class="grid-2">
+            <div><label>เอกสารแนบ</label><select><option>Flow การทำงานเดิม</option><option>ตัวอย่างเอกสาร</option><option>Screenshot ระบบ</option><option>Email / Chat ที่เกี่ยวข้อง</option><option>ข้อมูลตัวเลข / Report</option><option>ไม่มีเอกสารแนบ</option></select></div>
+            <div><label>ระดับความเร่งด่วน</label><select><option>สูงมาก - กระทบงานหลัก / ลูกค้า / รายได้ / Compliance</option><option>สูง - กระทบหลายแผนก หรือเกิดซ้ำบ่อย</option><option>ปานกลาง - กระทบในแผนก แต่มีวิธีแก้ชั่วคราว</option><option>ต่ำ - ข้อเสนอเพื่อเพิ่มประสิทธิภาพ</option></select></div>
+          </div>
+        </div>
+
+        <div class="submit-bar">
+          <p>เมื่อกดส่ง ระบบควรสร้างเลขที่คำขออัตโนมัติ และแจ้งเตือนหัวหน้าแผนกกับทีม Process Improvement</p>
+          <button class="submit-btn">ส่งคำขอปรับปรุง</button>
+        </div>
+      </div>
+
+      <aside class="side-card" id="status">
+        <h3 style="margin-top:0">Workflow สถานะคำขอ</h3>
+        <div class="status-list">
+          <div class="status-item"><div class="dot"></div><div><strong>New</strong><span>รับเรื่องใหม่</span></div></div>
+          <div class="status-item"><div class="dot warning"></div><div><strong>In Review</strong><span>หัวหน้า / PI วิเคราะห์</span></div></div>
+          <div class="status-item"><div class="dot"></div><div><strong>Approved</strong><span>อนุมัติให้ดำเนินการ</span></div></div>
+          <div class="status-item"><div class="dot warning"></div><div><strong>In Progress</strong><span>กำลังปรับปรุง</span></div></div>
+          <div class="status-item"><div class="dot"></div><div><strong>Testing</strong><span>ทดลองใช้งานจริง</span></div></div>
+          <div class="status-item"><div class="dot success"></div><div><strong>Completed</strong><span>ปิดงานและวัดผลแล้ว</span></div></div>
+          <div class="status-item"><div class="dot danger"></div><div><strong>Rejected / On Hold</strong><span>ยังไม่ดำเนินการ หรือพักไว้ก่อน</span></div></div>
+        </div>
+
+        <h3>ประเภทการปรับปรุง</h3>
+        <div class="urgency">
+          <div class="urgency-card"><strong>Quick Win</strong><span>แก้ได้เร็ว ผลกระทบชัด</span></div>
+          <div class="urgency-card"><strong>Process Redesign</strong><span>ออกแบบขั้นตอนใหม่</span></div>
+          <div class="urgency-card"><strong>Automation / Digital Workflow</strong><span>ลดงานมือด้วยระบบ</span></div>
+          <div class="urgency-card"><strong>Policy / Role Clarification</strong><span>ปรับกฎ บทบาท หรือ Owner</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <footer>Process Improvement Portal · Designed for internal employee pain point reporting</footer>
+  </main>
+</body>
+</html>
